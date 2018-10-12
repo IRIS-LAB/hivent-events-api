@@ -14,6 +14,14 @@ To run the server, run:
 npm start
 ```
 
+### Running the mongodb
+To run mongo in a container, run:
+
+```
+docker-compose up
+```
+
+
 To view the Swagger UI interface:
 
 ```
