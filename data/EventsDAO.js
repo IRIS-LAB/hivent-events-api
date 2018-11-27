@@ -28,7 +28,7 @@ export const getEvent = async eventId => {
 
 export const createEvent = async event => {
   let eventsDB = await connect()
-  let newEvent = await eventsDB.collection('Events').insertOne(resource)
+  let newEvent = await eventsDB.collection('Events').insertOne(event)
   //eventsDB.connection.close()
   return newEvent.ops[0]
 }
