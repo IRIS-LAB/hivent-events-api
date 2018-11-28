@@ -11,9 +11,9 @@ const connect = async () => {
   return db 
 }
 
-export const findEvents = async () => {
+export const findEvents = async (groupId, typeGroup, beginDate, endDate, idUser, interestedId, administratorId, participantId) => {
   let eventsDB = await connect()
-  let events = await eventsDB.collection('Events').find().toArray()
+  let events = await eventsDB.collection('Events').find({ "user.firstname": idUser }).toArray()
   // eventsDB.connection.close()
   return events
 }

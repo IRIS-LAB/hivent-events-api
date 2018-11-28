@@ -1,7 +1,7 @@
 import * as eventsDAO from '../data/EventsDAO'
 
-export const findEvents = async () => {
-  return await eventsDAO.findEvents()
+export const findEvents = async (groupId, typeGroup, beginDate, endDate, idUser, interestedId, administratorId, participantId) => {
+  return await eventsDAO.findEvents(groupId, typeGroup, beginDate, endDate, idUser, interestedId, administratorId, participantId)
 }
 
 export const getEvent = async eventId => {
