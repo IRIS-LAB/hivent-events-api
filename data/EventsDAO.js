@@ -1,7 +1,7 @@
 import { MongoClient, ObjectId } from 'mongodb'
 import {eventsDB} from './init/EventsDB'
 
-const url = 'mongodb://localhost:27017/'
+const url = 'mongodb://localhost:27021/'
 
 const connect = async () => {
 	let connection = await MongoClient.connect(
@@ -24,9 +24,24 @@ export const findEvents = async (
   let eventsDB = await connect()
   console.log("participant :",participantId)
   console.log(typeof(participantId))
+  let findRequest = { }
+  if (participantId !== undefined) {
+	  if (!findRequest.participants) {
+		findRequest.participants = {}
+	  } 
+	findRequest.participants.id = parseInt(participantId)
+	}
+	if (administratorId !== undefined) {
+		if (!findRequest.administrator) {
+		  findRequest.administrator = {}
+		} 
+	  findRequest.administrator.id = parseInt(administratorId)
+	  }
+
 	let events = await eventsDB
 		.collection('Events')
-		.find({"participants.id": parseInt(participantId)}).toArray()
+		.find(findRequest).toArray()
+//		.find({"participants.id": parseInt(participantId)}).toArray()
   console.log(events)
 	// eventsDB.connection.close()
 	return events
