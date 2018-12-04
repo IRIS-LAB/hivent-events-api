@@ -18,7 +18,7 @@ export const getRouter = () => {
       console.log(req.query.administratorId)
       console.log(req.query.participantId)
 
-      res.send(await eventsLBS.findEvents(req.query.groupId, req.query.typeGroup, req.query.beginDate, req.query.endDate, req.query.idUser, req.query.interestedId, req.query.administratorId, req.query.participantId))
+      res.send(await eventsLBS.findEvents(req.query.groupId, req.query.typeGroup, req.query.beginDate, req.query.endDate, req.query.interestedId, req.query.administratorId, req.query.participantId))
     } catch (error) {
       console.log('An error occured', error)
       res.status(500).send('An error occured')
@@ -40,6 +40,15 @@ export const getRouter = () => {
     } catch (error) {
       console.log('An error occured', error)
       res.status(500).send('An error occured')
+    }
+  })
+
+  eventsRouter.post('/init', async(req, res) => {
+    try {
+      res.send(await eventsLBS.init())
+    } catch (error) {
+      console.log(error)
+      
     }
   })
 
