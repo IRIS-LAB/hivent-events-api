@@ -1,5 +1,5 @@
 import { MongoClient, ObjectId } from 'mongodb'
-import {eventsDB} from './init/EventsDB'
+import { eventsDB } from './init/EventsDB'
 
 const url = 'mongodb://localhost:27021/'
 
@@ -21,28 +21,45 @@ export const findEvents = async (
 	administratorId,
 	participantId
 ) => {
-  let eventsDB = await connect()
-  console.log("participant :",participantId)
-  console.log(typeof(participantId))
-  let findRequest = { }
-  if (participantId !== undefined) {
-	  if (!findRequest.participants) {
-		findRequest.participants = {}
-	  } 
-	findRequest.participants.id = parseInt(participantId)
+	let eventsDB = await connect()
+	let findRequest = {}
+	if (groupId !== undefined) {
+		findRequest.groupId = parseInt(groupId)
+	}
+	if (groupId !== undefined) {
+		findRequest.groupId = parseInt(groupId)
+	}
+	if (beginDate !== undefined) {
+		findRequest.startDate = {}
+		findRequest.startDate.$gte = new Date(beginDate)
+	}
+	if (endDate !== undefined) {
+		if (!findRequest.startDate) {
+			findRequest.startDate = {}
+		}
+		findRequest.startDate.$lte = new Date(endDate)
+	}
+	if (interestedId !== undefined) {
+		if (!findRequest.interested) {
+			findRequest.interested = {}
+		}
+		findRequest.interested.id = parseInt(interestedId)
 	}
 	if (administratorId !== undefined) {
-		if (!findRequest.administrator) {
-		  findRequest.administrator = {}
-		} 
-	  findRequest.administrator.id = parseInt(administratorId)
-	  }
-
+		if (!findRequest.administrators) {
+			findRequest.administrators = {}
+		}
+		findRequest.administrators.id = parseInt(administratorId)
+	}
+	if (participantId !== undefined) {
+		if (!findRequest.participants) {
+			findRequest.participants = {}
+		}
+		findRequest.participants.id = parseInt(participantId)
+	}
 	let events = await eventsDB
 		.collection('Events')
 		.find(findRequest).toArray()
-//		.find({"participants.id": parseInt(participantId)}).toArray()
-  console.log(events)
 	// eventsDB.connection.close()
 	return events
 }
@@ -63,8 +80,8 @@ export const createEvent = async event => {
 }
 
 export const init = async () => {
-  let db = await connect()
-  //await db.collection('Events').drop()
+	let db = await connect()
+	//await db.collection('Events').drop()
 	let newEvents = await db.collection('Events').insertMany(eventsDB)
 	return newEvents.ops
 }
