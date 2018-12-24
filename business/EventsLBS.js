@@ -1,5 +1,6 @@
 import * as eventsDAO from '../data/EventsDAO'
 import { EventBE } from '../objects/business/be/EventBE';
+import {BusinessException ,ErrorDO} from 'iris-elements'
 const MAX_NAME_LENGTH = 100
 const MAX_DESCRIPTION_LENGTH = 250
 
@@ -13,39 +14,42 @@ const isDateValide = async input => {
 }
 
 const checkEventBE = async event => {
+  let errors = []
   // name
   if (!event.name) {
-		throw Error('Le nom est obligatoire')
+		errors.push(new ErrorDO('name', 'event.name.required', 'Le nom est obligatoire'))
 	} else {
 		if (event.name.length > MAX_NAME_LENGTH) {
-			throw Error('La longueur du nom ne doit pas dépasser ' + MAX_NAME_LENGTH + ' caractères')
+		  errors.push(new ErrorDO('name', 'event.name.length','La longueur du nom ne doit pas dépasser ' + MAX_NAME_LENGTH + ' caractères'))
 		}
 	}
   // description
   if (!event.description) {
-    throw Error('La description est obligatoire')
+    errors.push( new ErrorDO('description', 'event.description.required', 'La description est obligatoire'))
   } else {
     if (event.description.length > MAX_DESCRIPTION_LENGTH) {
-      throw Error('La longueur de la description ne doit pas dépasser ' + MAX_DESCRIPTION_LENGTH + ' caractères')
+      errors.push(new ErrorDO('description', 'event.description.length','La longueur de la description ne doit pas dépasser ' + MAX_DESCRIPTION_LENGTH + ' caractères'))
     }
   }
   // startDate
   if (!event.startDate) {
-    throw Error('La date debut est obligatoire')
+    errors.push(new ErrorDO('startDate', 'event.startDate.required', 'La date debut est obligatoire'))
   } else if (! await isDateValide(event.startDate)) {
    // controle dateTime format ! 2018-03-15T18:00:00+03:00
-    throw Error('Mauvais type')
+    errors.push(new ErrorDO('startDate', 'event.startDate.type', 'Bad type'))
   }
   // endDate
   if(!event.endDate){
-    throw Error('La date fin est obligatoire')
+    errors.push(new ErrorDO('endDate', 'event.endDate.required', 'La date fin est obligatoire'))
   } else if (! await isDateValide(event.endDate)){
-    throw Error ('Mauvais type')
+    errors.push(new ErrorDO('endDate', 'event.endDate.type', 'Bad type'))
   }
-  
+
   if(Date.parse(event.startDate) > Date.parse(event.endDate)){
-    throw Error('Date debut superieur à date fin')
+    errors.push(new ErrorDO('date', 'event.date', 'Date debut sup à date fin'))
   }
+
+  return errors
 }
 
 
@@ -60,7 +64,10 @@ export const getEvent = async eventId => {
 
 export const createEvent = async event => {
   console.log('EventLBS : ' + event)
-  await checkEventBE(event)
+  let errors = await checkEventBE(event)
+  if (errors.length > 0) {
+		throw new BusinessException(errors)
+	}
   return await eventsDAO.createEvent(event)
 }
 

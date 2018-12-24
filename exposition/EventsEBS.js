@@ -2,6 +2,7 @@ import express from 'express'
 import * as eventsLBS from '../business/EventsLBS'
 import { EventBE } from '../objects/business/be/EventBE'
 import * as mappers from './mappers/Mappers'
+import {BusinessException } from 'iris-elements'
 
 export const getRouter = () => {
   let eventsRouter = express.Router()
@@ -22,7 +23,7 @@ export const getRouter = () => {
       res.send(await eventsLBS.getEvent(req.params.eventId))
     } catch (error) {
       console.log('An error occured', error)
-      res.status(500).send('An error occured')
+			res.status(500).send('An error occured')
     }
   })
 
@@ -34,7 +35,11 @@ export const getRouter = () => {
       res.send(await eventsLBS.createEvent(eventBe))
     } catch (error) {
       console.log('An error occured', error)
-      res.status(500).send('An error occured')
+      if(error instanceof BusinessException) {
+				res.status(400).send(error)
+			} else {
+			res.status(500).send('An error occured')
+			}
     }
   })
 
