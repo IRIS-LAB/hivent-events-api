@@ -5,7 +5,7 @@ export class EventBE {
 		this.startDate = startDate
 		this.endDate = endDate
 	}
-
+/*
 	get name() {
 		return this.name
 	}
@@ -21,4 +21,5 @@ export class EventBE {
 	get endDate() {
 		return this.endDate
 	}
+	*/
 }

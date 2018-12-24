@@ -3,46 +3,50 @@ import { EventBE } from '../objects/business/be/EventBE';
 const MAX_NAME_LENGTH = 100
 const MAX_DESCRIPTION_LENGTH = 250
 
-function isDateValide(input) {
-  let regex = /^(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z))$/
+const isDateValide = async input => {
+  let regex = RegExp(/^((19|20)[0-9][0-9])[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])[T]([01][1-9]|[2][0-3])[:]([0-5][0-9])[:]([0-5][0-9])([+|-]([01][0-9]|[2][0-3])[:]([0-5][0-9])){0,1}$/)
   if (!regex.test(input)) {
     return false
   } else {
-    return false
+    return true
   } 
 }
 
-const checkEventBE = EventBE => {
+const checkEventBE = async event => {
   // name
-  if (!EventBE.name) {
+  if (!event.name) {
 		throw Error('Le nom est obligatoire')
 	} else {
-		if (EventBE.name.length > MAX_NAME_LENGTH) {
+		if (event.name.length > MAX_NAME_LENGTH) {
 			throw Error('La longueur du nom ne doit pas dépasser ' + MAX_NAME_LENGTH + ' caractères')
 		}
 	}
   // description
-  if (!EventBE.description) {
+  if (!event.description) {
     throw Error('La description est obligatoire')
   } else {
-    if (EventBE.description.length > MAX_DESCRIPTION_LENGTH) {
+    if (event.description.length > MAX_DESCRIPTION_LENGTH) {
       throw Error('La longueur de la description ne doit pas dépasser ' + MAX_DESCRIPTION_LENGTH + ' caractères')
     }
   }
   // startDate
-  if (!EventBE.startDate) {
-    throw Error('La date est obligatoire')
-  } else {
+  if (!event.startDate) {
+    throw Error('La date debut est obligatoire')
+  } else if (! await isDateValide(event.startDate)) {
    // controle dateTime format ! 2018-03-15T18:00:00+03:00
-   
-
+    throw Error('Mauvais type')
   }
   // endDate
-
-
+  if(!event.endDate){
+    throw Error('La date fin est obligatoire')
+  } else if (! await isDateValide(event.endDate)){
+    throw Error ('Mauvais type')
+  }
+  
+  if(Date.parse(event.startDate) > Date.parse(event.endDate)){
+    throw Error('Date debut superieur à date fin')
+  }
 }
-
-
 
 
 export const findEvents = async (groupId, typeGroup, beginDate, endDate, interestedId, administratorId, participantId) => {
@@ -55,8 +59,8 @@ export const getEvent = async eventId => {
 }
 
 export const createEvent = async event => {
-  console.log('EventLBS : ' + EventBE)
-  checkEventBE(EventBE)
+  console.log('EventLBS : ' + event)
+  await checkEventBE(event)
   return await eventsDAO.createEvent(event)
 }
 
