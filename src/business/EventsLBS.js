@@ -1,17 +1,11 @@
 import * as eventsDAO from '../data/EventsDAO'
 import { EventBE } from '../objects/business/be/EventBE';
 import {BusinessException ,ErrorDO} from 'iris-elements'
+var isValid = require('date-fns/is_valid')
+
 const MAX_NAME_LENGTH = 100
 const MAX_DESCRIPTION_LENGTH = 250
 
-const isDateValide = async input => {
-  let regex = RegExp(/^((19|20)[0-9][0-9])[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])[T]([01][1-9]|[2][0-3])[:]([0-5][0-9])[:]([0-5][0-9])([+|-]([01][0-9]|[2][0-3])[:]([0-5][0-9])){0,1}$/)
-  if (!regex.test(input)) {
-    return false
-  } else {
-    return true
-  } 
-}
 
 const checkEventBE = async event => {
   let errors = []
@@ -34,14 +28,14 @@ const checkEventBE = async event => {
   // startDate
   if (!event.startDate) {
     errors.push(new ErrorDO('startDate', 'event.startDate.required', 'La date debut est obligatoire'))
-  } else if (! await isDateValide(event.startDate)) {
+  } else if (! await isValid(new Date(event.startDate))) {
    // controle dateTime format ! 2018-03-15T18:00:00+03:00
     errors.push(new ErrorDO('startDate', 'event.startDate.type', 'Bad type'))
   }
   // endDate
   if(!event.endDate){
     errors.push(new ErrorDO('endDate', 'event.endDate.required', 'La date fin est obligatoire'))
-  } else if (! await isDateValide(event.endDate)){
+  } else if (! await isValid(new Date(event.endDate))){
     errors.push(new ErrorDO('endDate', 'event.endDate.type', 'Bad type'))
   }
 
