@@ -1,11 +1,15 @@
 import * as eventsDAO from '../data/EventsDAO'
 import { EventBE } from '../objects/business/be/EventBE';
 import {BusinessException ,ErrorDO} from 'iris-elements'
-var isValid = require('date-fns/is_valid')
+// import * as moment from 'moment'
+var moment = require('moment'); 
 
 const MAX_NAME_LENGTH = 100
 const MAX_DESCRIPTION_LENGTH = 250
 
+const checkTypeDate = async (date) => {
+  return moment(date, moment.HTML5_FMT.DATETIME_LOCAL_MS, true).isValid()
+}
 
 const checkEventBE = async event => {
   let errors = []
@@ -28,14 +32,14 @@ const checkEventBE = async event => {
   // startDate
   if (!event.startDate) {
     errors.push(new ErrorDO('startDate', 'event.startDate.required', 'La date debut est obligatoire'))
-  } else if (! await isValid(new Date(event.startDate))) {
+  } else if (! await checkTypeDate(event.startDate)) {
    // controle dateTime format ! 2018-03-15T18:00:00+03:00
     errors.push(new ErrorDO('startDate', 'event.startDate.type', 'Bad type'))
   }
   // endDate
   if(!event.endDate){
     errors.push(new ErrorDO('endDate', 'event.endDate.required', 'La date fin est obligatoire'))
-  } else if (! await isValid(new Date(event.endDate))){
+  } else if (! await checkTypeDate(event.endDate)){
     errors.push(new ErrorDO('endDate', 'event.endDate.type', 'Bad type'))
   }
 
