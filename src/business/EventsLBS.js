@@ -18,7 +18,7 @@ export const getEvent = async eventId => {
 export const createEvent = async event => {
   console.log('EventLBS : ' + event)
   try {
-    let errors = await validatorLBS.checkEventBE(event)
+    await validatorLBS.checkEventBE(event)
     return await eventsDAO.createEvent(event)
   } catch (error) {
     throw error
