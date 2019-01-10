@@ -12,46 +12,38 @@ const connect = async () => {
 	return db
 }
 
-export const findEvents = async (
-	groupId,
-	typeGroup,
-	beginDate,
-	endDate,
-	interestedId,
-	administratorId,
-	participantId
-) => {
+export const findEvents = async (query) => {
 	let eventsDB = await connect()
 	let findRequest = {}
-	if (groupId !== undefined) {
+	if (query.groupId !== undefined) {
 		findRequest.groupId = parseInt(groupId)
 	}
-	if (groupId !== undefined) {
+	if (query.groupId !== undefined) {
 		findRequest.groupId = parseInt(groupId)
 	}
-	if (beginDate !== undefined) {
+	if (query.beginDate !== undefined) {
 		findRequest.startDate = {}
 		findRequest.startDate.$gte = new Date(beginDate)
 	}
-	if (endDate !== undefined) {
+	if (query.endDate !== undefined) {
 		if (!findRequest.startDate) {
 			findRequest.startDate = {}
 		}
 		findRequest.startDate.$lte = new Date(endDate)
 	}
-	if (interestedId !== undefined) {
+	if (query.interestedId !== undefined) {
 		if (!findRequest.interested) {
 			findRequest.interested = {}
 		}
 		findRequest.interested.id = parseInt(interestedId)
 	}
-	if (administratorId !== undefined) {
+	if (query.administratorId !== undefined) {
 		if (!findRequest.administrators) {
 			findRequest.administrators = {}
 		}
 		findRequest.administrators.id = parseInt(administratorId)
 	}
-	if (participantId !== undefined) {
+	if (query.participantId !== undefined) {
 		if (!findRequest.participants) {
 			findRequest.participants = {}
 		}

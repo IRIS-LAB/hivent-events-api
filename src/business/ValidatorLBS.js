@@ -1,3 +1,5 @@
+import { BusinessException } from '../../node_modules/iris-elements';
+
 var moment = require('moment'); 
 
 const MAX_NAME_LENGTH = 100
@@ -9,7 +11,9 @@ const checkTypeDate = async (date) => {
 
 export const checkEventBE = async event => {
     let errors = [... checkName(event), ... checkDescription(event), ... checkStartDate(event), ...checkEndDate(event), ...checkStartDate(event) ]
-    return errors
+    if (errors.length > 0 ){
+        throw new BusinessException(errors)
+    }
 }
 
 export const checkName = async (event) => {

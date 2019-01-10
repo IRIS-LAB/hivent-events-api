@@ -6,9 +6,9 @@ import * as validatorLBS from './ValidatorLBS'
 
 
 
-export const findEvents = async (groupId, typeGroup, beginDate, endDate, interestedId, administratorId, participantId) => {
+export const findEvents = async (query) => {
   console.log("LBS participant" , participantId)
-  return await eventsDAO.findEvents(groupId, typeGroup, beginDate, endDate, interestedId, administratorId, participantId)
+  return await eventsDAO.findEvents(query)
 }
 
 export const getEvent = async eventId => {
@@ -17,11 +17,13 @@ export const getEvent = async eventId => {
 
 export const createEvent = async event => {
   console.log('EventLBS : ' + event)
-  let errors = await validatorLBS.checkEventBE(event)
-  if (errors.length > 0) {
-		throw new BusinessException(errors)
-	}
-  return await eventsDAO.createEvent(event)
+  try {
+    let errors = await validatorLBS.checkEventBE(event)
+    return await eventsDAO.createEvent(event)
+  } catch (error) {
+    throw error
+  }
+  
 }
 
 export const init = async () => {

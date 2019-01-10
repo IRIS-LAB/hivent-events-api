@@ -10,7 +10,7 @@ export const getRouter = () => {
   // find
   eventsRouter.get('/', async (req, res) => {
     try {
-      res.send(await eventsLBS.findEvents(req.query.groupId, req.query.typeGroup, req.query.beginDate, req.query.endDate, req.query.interestedId, req.query.administratorId, req.query.participantId))
+      res.send(await eventsLBS.findEvents(req.query))
     } catch (error) {
       console.log('An error occured', error)
       res.status(500).send('An error occured')
