@@ -1,7 +1,7 @@
 import { MongoClient, ObjectId } from 'mongodb'
 import { eventsDB } from './init/EventsDB'
 
-const url = 'mongodb://localhost:27017/'
+const url = 'mongodb://localhost:27021/'
 
 const connect = async () => {
 	let connection = await MongoClient.connect(

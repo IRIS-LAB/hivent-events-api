@@ -7,7 +7,6 @@ import * as validatorLBS from './ValidatorLBS'
 
 
 export const findEvents = async (query) => {
-  console.log("LBS participant" , participantId)
   return await eventsDAO.findEvents(query)
 }
 
