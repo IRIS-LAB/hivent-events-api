@@ -2,7 +2,7 @@ import express from 'express'
 import * as eventsLBS from '../business/EventsLBS'
 import { EventBE } from '../objects/business/be/EventBE'
 import * as mappers from './mappers/Mappers'
-import {BusinessException } from 'iris-elements'
+import {BusinessException } from 'iris-common'
 
 export const getRouter = () => {
   let eventsRouter = express.Router()

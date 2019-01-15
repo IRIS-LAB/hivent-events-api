@@ -1,4 +1,4 @@
-import { BusinessException, ErrorDO } from '../../node_modules/iris-elements';
+import { BusinessException, ErrorDO } from 'iris-common';
 
 var moment = require('moment'); 
 
