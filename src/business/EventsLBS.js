@@ -1,6 +1,6 @@
 import * as eventsDAO from '../data/EventsDAO'
 import { EventBE } from '../objects/business/be/EventBE'
-import {BusinessException ,ErrorDO} from 'iris-elements'
+import {BusinessException ,ErrorDO} from 'iris-common'
 import * as validatorLBS from './ValidatorLBS'
 // import * as moment from 'moment'
 
