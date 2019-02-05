@@ -14,7 +14,8 @@ export const checkEventBE = event => {
     ...checkName(event),
     ...checkDescription(event),
     ...checkStartDate(event),
-    ...checkEndDate(event)
+    ...checkEndDate(event),
+    ...checkAdministrator(event)
   ]
   if (errors.length > 0) {
     throw new BusinessException(errors)
@@ -116,6 +117,26 @@ export const checkStartDateBeforeEndDate = event => {
         )
       )
     }
+  }
+  return errors
+}
+
+export const checkAdministrator = event => {
+  let errors = []
+
+  let hasAdministrator =
+    event.administrators &&
+    Array.isArray(event.administrators) &&
+    event.administrators.length > 0
+
+  if (!hasAdministrator) {
+    errors.push(
+      new ErrorDO(
+        'administrators',
+        'event.administrators',
+        'Administrators mandatory.'
+      )
+    )
   }
   return errors
 }

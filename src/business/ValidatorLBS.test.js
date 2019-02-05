@@ -4,7 +4,8 @@ import {
   checkDescription,
   checkStartDate,
   checkEndDate,
-  checkStartDateBeforeEndDate
+  checkStartDateBeforeEndDate,
+  checkAdministrator
 } from './ValidatorLBS'
 import { EventBE } from '../objects/business/be/EventBE'
 import { BusinessException } from 'iris-common'
@@ -16,7 +17,10 @@ describe('ValidatorLBS', () => {
         'name',
         'description',
         '2018-11-04T09:00:00.000+01:00',
-        '2018-11-04T10:00:00.000+01:00'
+        '2018-11-04T10:00:00.000+01:00',
+        null,
+        [1],
+        null
       )
       let err = () => {
         checkEventBE(eventBE)
@@ -241,6 +245,35 @@ describe('ValidatorLBS', () => {
       const errors = checkStartDateBeforeEndDate(eventBE)
       expect(errors).toHaveLength(1)
       expect(errors[0].errorCode).toBe('event.date')
+    })
+  })
+
+  describe('checkAdministrator', () => {
+    it('Administrator should not be null', () => {
+      const eventBE = new EventBE(null, null, null, null, null, null, null)
+      const errors = checkAdministrator(eventBE)
+      expect(errors).toHaveLength(1)
+      expect(errors[0].errorCode).toBe('event.administrators')
+    })
+
+    it('Administrators should not be undefined', () => {
+      const eventBE = new EventBE(null, null, null, null, null, undefined, null)
+      const errors = checkAdministrator(eventBE)
+      expect(errors).toHaveLength(1)
+      expect(errors[0].errorCode).toBe('event.administrators')
+    })
+
+    it('Administrators should not be empty', () => {
+      const eventBE = new EventBE(null, null, null, null, null, [], null)
+      const errors = checkAdministrator(eventBE)
+      expect(errors).toHaveLength(1)
+      expect(errors[0].errorCode).toBe('event.administrators')
+    })
+
+    it('Administrators is defined', () => {
+      const eventBE = new EventBE(null, null, null, null, null, [1], null)
+      const errors = checkAdministrator(eventBE)
+      expect(errors).toHaveLength(0)
     })
   })
 })

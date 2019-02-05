@@ -1,11 +1,24 @@
 export class EventBE {
-	constructor(name, description, startDate, endDate) {
-		this.name = name
-		this.description = description
-		this.startDate = startDate
-		this.endDate = endDate
-	}
-/*
+  constructor(
+    name,
+    description,
+    startDate,
+    endDate,
+    participants,
+    administrators,
+    interested,
+    groupId
+  ) {
+    this.name = name
+    this.description = description
+    this.startDate = startDate
+    this.endDate = endDate
+    this.participants = participants
+    this.administrators = administrators
+    this.interested = interested
+    this.groupId = groupId
+  }
+  /*
 	get name() {
 		return this.name
 	}
