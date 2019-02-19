@@ -43,6 +43,22 @@ export const getRouter = () => {
     }
   })
 
+  // update
+  eventsRouter.put('/', async (req, res) => {
+    try {
+      let eventBe = mappers.jsonToEventBE(req.body)
+      console.log(typeof eventBe)
+      res.send(await eventsLBS.updateEvent(eventBe))
+    } catch (error) {
+      console.log('An error occured', error)
+      if (error instanceof BusinessException) {
+        res.status(400).send(error)
+      } else {
+        res.status(500).send('An error occured')
+      }
+    }
+  })
+
   // initialisation de la base
   eventsRouter.post('/init', async (req, res) => {
     try {

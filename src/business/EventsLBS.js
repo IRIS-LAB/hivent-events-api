@@ -1,12 +1,10 @@
 import * as eventsDAO from '../data/EventsDAO'
 import { EventBE } from '../objects/business/be/EventBE'
-import {BusinessException ,ErrorDO} from 'iris-common'
+import { BusinessException, ErrorDO } from 'iris-common'
 import * as validatorLBS from './ValidatorLBS'
 // import * as moment from 'moment'
 
-
-
-export const findEvents = async (query) => {
+export const findEvents = async query => {
   return await eventsDAO.findEvents(query)
 }
 
@@ -22,7 +20,16 @@ export const createEvent = async event => {
   } catch (error) {
     throw error
   }
-  
+}
+
+export const updateEvent = async event => {
+  console.log('EventLBS : ' + event)
+  try {
+    await validatorLBS.checkEventBE(event)
+    return await eventsDAO.updateEvent(event)
+  } catch (error) {
+    throw error
+  }
 }
 
 export const init = async () => {
