@@ -1,5 +1,18 @@
+import { db } from './db'
+
+export const createEvent = async eventBE => {
+  // Construct event
+  let event = JSON.parse(JSON.stringify(eventBE))
+  // Set up path
+  let doc = db.collection('events').doc()
+  event.id = doc.id
+  // Create document
+  await doc.set(event)
+  // Return data
+  return event
+}
+
 import { MongoClient, ObjectId } from 'mongodb'
-import { eventsDB } from './init/EventsDB'
 import { TechnicalException } from 'iris-common'
 
 const url = 'mongodb://localhost:27021/'
@@ -85,18 +98,4 @@ export const updateEvent = async event => {
     console.log(response.ok)
     throw new TechnicalException('Response not ok, code : ' + response.ok)
   }
-}
-
-export const createEvent = async event => {
-  let eventsDB = await connect()
-  let newEvent = await eventsDB.collection('Events').insertOne(event)
-  //eventsDB.connection.close()
-  return newEvent.ops[0]
-}
-
-export const init = async () => {
-  let db = await connect()
-  //await db.collection('Events').drop()
-  let newEvents = await db.collection('Events').insertMany(eventsDB)
-  return newEvents.ops
 }

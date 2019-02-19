@@ -1,38 +1,24 @@
 export class EventBE {
   constructor(
-    name,
+    title,
     description,
     startDate,
     endDate,
-    participants,
-    administrators,
-    interested,
-    groupId
+    administratorIds,
+    speakerIds,    
+    maxSeatsNb,
+    roomId
   ) {
-    this.name = name
+    this.id = undefined
+    this.title = title
     this.description = description
     this.startDate = startDate
     this.endDate = endDate
-    this.participants = participants
-    this.administrators = administrators
-    this.interested = interested
-    this.groupId = groupId
+    this.administratorIds = administratorIds // array of ids
+    this.speakerIds = speakerIds // array of ids
+    this.maxSeatsNb = maxSeatsNb
+    this.participants = [] // array of ParticipantBE
+    this.roomId = roomId || 'irisLab'
+    this.isDrawDone = false
   }
-  /*
-	get name() {
-		return this.name
-	}
-
-	get description() {
-		return this.description
-	}
-
-	get startDate() {
-		return this.startDate
-	}
-
-	get endDate() {
-		return this.endDate
-	}
-	*/
 }

@@ -30,9 +30,7 @@ export const getRouter = () => {
   // create
   eventsRouter.post('/', async (req, res) => {
     try {
-      let eventBe = mappers.jsonToEventBE(req.body)
-      console.log(typeof eventBe)
-      res.send(await eventsLBS.createEvent(eventBe))
+      res.send(await eventsLBS.createEvent(req.body))
     } catch (error) {
       console.log('An error occured', error)
       if (error instanceof BusinessException) {

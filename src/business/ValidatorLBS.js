@@ -1,3 +1,4 @@
+import Joi from 'joi'
 import { BusinessException, ErrorDO } from 'iris-common'
 
 var moment = require('moment')
@@ -5,19 +6,34 @@ var moment = require('moment')
 const MAX_NAME_LENGTH = 100
 const MAX_DESCRIPTION_LENGTH = 250
 
+export const JoiValidator = () => {
+  return {
+    Event: Joi.object().keys({
+      id: Joi.optional(),
+      title: Joi.required(),
+      description: Joi.string().required(),
+      startDate: Joi.date().iso().required(),
+      endDate: Joi.date().iso().required(),
+      administratorIds: Joi.required(), // array of ids
+      speakerIds: Joi.required(), // array of ids
+      maxSeatsNb: Joi.required(),
+      participants: Joi.default([]), // array of ParticipantBE
+      roomId: Joi.default('irisLab'),
+      isDrawDone: Joi.default(false)
+    })
+  }
+}
 const checkTypeDate = date => {
   return moment(date, 'YYYY-MM-DDTHH:mm:ss.SSSZ', true).isValid()
 }
 
 export const checkEventBE = event => {
-  let errors = [
-    ...checkName(event),
-    ...checkDescription(event),
-    ...checkStartDate(event),
-    ...checkEndDate(event),
-    ...checkAdministrator(event)
-  ]
-  if (errors.length > 0) {
+  const { error } = Joi.validate(event, JoiValidator().Event, { abortEarly: false })
+  if (error) {
+    const errors = error.details.map(({ message, context }) => {
+      const field = context.key
+      return new ErrorDO(field, `${field}.validator`, message)
+    })
     throw new BusinessException(errors)
   }
 }
