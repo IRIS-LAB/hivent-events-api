@@ -1,19 +1,20 @@
-import Joi from 'joi'
+import JoiBase from 'joi'
 import { BusinessException, ErrorDO } from 'iris-common'
+import JoiDateExtension from 'joi-date-extensions'
 
-var moment = require('moment')
-
-const MAX_NAME_LENGTH = 100
+const MAX_TITLE_LENGTH = 100
 const MAX_DESCRIPTION_LENGTH = 250
 
-export const JoiValidator = () => {
+const Joi = JoiBase.extend(JoiDateExtension)
+
+const JoiValidator = () => {
   return {
     Event: Joi.object().keys({
       id: Joi.optional(),
-      title: Joi.required(),
-      description: Joi.string().required(),
-      startDate: Joi.date().iso().required(),
-      endDate: Joi.date().iso().required(),
+      title: Joi.string().max(MAX_TITLE_LENGTH).required(),
+      description: Joi.string().max(MAX_DESCRIPTION_LENGTH).required(),
+      startDate: Joi.date().format("YYYY-MM-DDTHH:mm:ss.SSSZ").required(),
+      endDate: Joi.date().format("YYYY-MM-DDTHH:mm:ss.SSSZ").required(),
       administratorIds: Joi.required(), // array of ids
       speakerIds: Joi.required(), // array of ids
       maxSeatsNb: Joi.required(),
@@ -23,16 +24,17 @@ export const JoiValidator = () => {
     })
   }
 }
-const checkTypeDate = date => {
-  return moment(date, 'YYYY-MM-DDTHH:mm:ss.SSSZ', true).isValid()
-}
+// const checkTypeDate = date => {
+//   return moment(date, 'YYYY-MM-DDTHH:mm:ss.SSSZ', true).isValid()
+// }
 
 export const checkEventBE = event => {
   const { error } = Joi.validate(event, JoiValidator().Event, { abortEarly: false })
   if (error) {
-    const errors = error.details.map(({ message, context }) => {
+    error.details.map((o) => console.log(o))
+    const errors = error.details.map(({ message, context, type }) => {
       const field = context.key
-      return new ErrorDO(field, `${field}.validator`, message)
+      return new ErrorDO(field, `${field}.${type}`, message.replace(/\"/g, ""))
     })
     throw new BusinessException(errors)
   }
