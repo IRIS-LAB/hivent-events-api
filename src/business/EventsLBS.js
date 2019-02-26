@@ -1,8 +1,5 @@
 import * as eventsDAO from '../data/EventsDAO'
-import { EventBE } from '../objects/business/be/EventBE'
-import { BusinessException, ErrorDO } from 'iris-common'
 import * as validatorLBS from './ValidatorLBS'
-// import * as moment from 'moment'
 
 export const findEvents = async query => {
   return await eventsDAO.findEvents(query)
@@ -15,7 +12,7 @@ export const getEvent = async eventId => {
 export const createEvent = async event => {
   console.log('EventLBS : ' + event)
   try {
-    await validatorLBS.checkEventBE(event)
+    event = validatorLBS.checkEvent(event)
     return await eventsDAO.createEvent(event)
   } catch (error) {
     throw error

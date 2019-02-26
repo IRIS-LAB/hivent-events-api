@@ -4,7 +4,7 @@ import * as eventsEBS from './src/exposition/EventsEBS'
 import * as actuatorEBS from './src/exposition/ActuatorEBS'
 
 const app = express()
-const port = process.env.PORT || 8080
+const port = process.env.PORT || 8081
 
 app.listen(port, () => {
   console.log(`http://localhost:${port}`)
