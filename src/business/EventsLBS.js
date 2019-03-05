@@ -10,25 +10,30 @@ export const getEvent = async eventId => {
 }
 
 export const createEvent = async event => {
-  console.log('EventLBS : ' + event)
   try {
     event = validatorLBS.checkEvent(event)
-    return await eventsDAO.createEvent(event)
+    const id = await eventsDAO.createEvent(event)
+    return await getEvent(id)
   } catch (error) {
     throw error
   }
 }
 
-export const updateEvent = async event => {
-  console.log('EventLBS : ' + event)
+export const updateEvent = async (event,id) => {
   try {
-    await validatorLBS.checkEventBE(event)
-    return await eventsDAO.updateEvent(event)
+    event.id = id
+    await validatorLBS.checkEvent(event)
+    await eventsDAO.updateEvent(event)
+    return await getEvent(event.id)
   } catch (error) {
     throw error
   }
 }
 
-export const init = async () => {
-  return await eventsDAO.init()
+export const deleteEvent = async id => {
+  try {
+    await eventsDAO.deleteEvent(id)
+  } catch (error) {
+    throw error
+  }
 }

@@ -1,5 +1,5 @@
 import JoiBase from 'joi'
-import { BusinessException, ErrorDO } from 'iris-common'
+import { BusinessException, ErreurDO } from '@u-iris/iris-common'
 import JoiDateExtension from 'joi-date-extensions'
 
 const MAX_TITLE_LENGTH = 100
@@ -30,7 +30,7 @@ export const checkEvent = event => {
   if (error) {
     const errors = error.details.map(({ message, context, type }) => {
       const field = context.key
-      return new ErrorDO(field, `${field}.${type}`, message.replace(/\"/g, ""))
+      return new ErreurDO(field, `${field}.${type}`, message.replace(/\"/g, ""))
     })
     throw new BusinessException(errors)
   }

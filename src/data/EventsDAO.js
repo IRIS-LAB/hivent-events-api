@@ -39,5 +39,15 @@ export const createEvent = async event => {
   // Create document
   await doc.set(event)
   // Return data
-  return event
+  return event.id
+}
+
+export const updateEvent = async event => {
+  let doc = db.collection('events').doc(event.id)
+  await doc.set(event)
+}
+
+export const deleteEvent = async id => {
+  let doc = db.collection('events').doc(id)
+  await doc.delete()
 }

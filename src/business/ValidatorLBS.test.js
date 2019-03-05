@@ -1,5 +1,5 @@
 import { checkEvent } from './ValidatorLBS'
-import { BusinessException } from 'iris-common'
+import { BusinessException } from '@u-iris/iris-common'
 
 describe('ValidatorLBS', () => {
   let event = undefined

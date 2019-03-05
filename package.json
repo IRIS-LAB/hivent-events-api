@@ -23,13 +23,14 @@
   "dependencies": {
     "@babel/runtime": "^7.1.2",
     "@google-cloud/firestore": "^1.0.1",
+    "@u-iris/iris-back": "^1.0.11",
+    "@u-iris/iris-common": "^1.0.7",
     "body-parser": "^1.18.3",
+    "dotenv": "^6.2.0",
     "express": "^4.16.4",
-    "iris-common": "^1.0.3",
     "joi": "^14.3.1",
     "joi-date-extensions": "^1.2.0",
     "moment": "^2.3.0",
-    "mongodb": "^3.1.8",
     "node-fetch": "^2.2.1"
   },
   "devDependencies": {
