@@ -1,279 +1,267 @@
-import {
-  checkEventBE,
-  checkName,
-  checkDescription,
-  checkStartDate,
-  checkEndDate,
-  checkStartDateBeforeEndDate,
-  checkAdministrator
-} from './ValidatorLBS'
-import { EventBE } from '../objects/business/be/EventBE'
-import { BusinessException } from 'iris-common'
+import { checkEvent } from './ValidatorLBS'
+import { BusinessException } from '@u-iris/iris-common'
 
 describe('ValidatorLBS', () => {
-  describe('checkEventBE', () => {
-    it('Should NOT throw an exception when event is valid', () => {
-      let eventBE = new EventBE(
-        'name',
-        'description',
-        '2018-11-04T09:00:00.000+01:00',
-        '2018-11-04T10:00:00.000+01:00',
-        null,
-        [1],
-        null
-      )
-      let err = () => {
-        checkEventBE(eventBE)
-      }
-      expect(err).not.toThrow()
+  let event = undefined
+  beforeEach(() => {
+    event = {
+      title: 'Test',
+      description: 'description du test',
+      startDate: '2019-02-19T18:13:00.000+01:00',
+      endDate: '2019-02-19T18:15:00.000+01:00',
+      administratorIds: ['admin.nom@systeme-u.fr'],
+      speakerIds: ['speaker.nom@systeme-u.fr'],
+      maxSeatsNb: 10
+    }
+  })
+
+  it('Should NOT throw an exception when event is valid', () => {
+    let err = () => {
+      checkEvent(event)
+    }
+    expect(err).not.toThrow()
+  })
+
+  const checkInvalidity = (event, field, code) => {
+    let err = undefined
+    try {
+      checkEvent(event)
+    } catch (error) {
+      err = error
+    }
+    expect(err).toBeInstanceOf(BusinessException)
+    expect(err.errors[0].champErreur).toBe(field)
+    expect(err.errors[0].codeErreur).toBe(code)
+  }
+
+  describe('title', () => {
+    it('Should return an error when not set', () => {
+      event.title = undefined
+      checkInvalidity(event, 'title', 'any.required')
     })
 
-    it('Should throw an exception when event is invalid', () => {
-      let eventBE = new EventBE(null, null, null, null)
-      let err = () => {
-        checkEventBE(eventBE)
-      }
-      expect(err).toThrow(BusinessException)
+    it('Should return an error when empty', () => {
+      event.title = ''
+      checkInvalidity(event, 'title', 'any.empty')
+    })
+
+    it('Should return an error when length greater than 100', () => {
+      event.title = '1'.repeat(101)
+      checkInvalidity(event, 'title', 'string.max')
     })
   })
 
-  describe('checkName', () => {
-    it('Should be valid', () => {
-      const eventBE = new EventBE('name', null, null, null)
-      const errors = checkName(eventBE)
-      expect(errors).toHaveLength(0)
+  describe('description', () => {
+    it('Should return an error when not set', () => {
+      event.description = undefined
+      checkInvalidity(event, 'description', 'any.required')
     })
 
-    it('Should retun an error about field required', () => {
-      const eventBE = new EventBE(undefined, null, null, null)
-      const errors = checkName(eventBE)
-      expect(errors).toHaveLength(1)
-      expect(errors[0].errorField).toBe('name')
-      expect(errors[0].errorCode).toBe('event.name.required')
+    it('Should return an error when empty', () => {
+      event.description = ''
+      checkInvalidity(event, 'description', 'any.empty')
     })
 
-    it('Should retun an error about field required', () => {
-      const eventBE = new EventBE(null, null, null, null)
-      const errors = checkName(eventBE)
-      expect(errors).toHaveLength(1)
-      expect(errors[0].errorField).toBe('name')
-      expect(errors[0].errorCode).toBe('event.name.required')
-    })
-
-    it('Should retun an error about field required', () => {
-      const eventBE = new EventBE('', null, null, null)
-      const errors = checkName(eventBE)
-      expect(errors).toHaveLength(1)
-      expect(errors[0].errorField).toBe('name')
-      expect(errors[0].errorCode).toBe('event.name.required')
-    })
-
-    it('Should retun an error about field required', () => {
-      const eventBE = new EventBE(0, null, null, null)
-      const errors = checkName(eventBE)
-      expect(errors).toHaveLength(1)
-      expect(errors[0].errorField).toBe('name')
-      expect(errors[0].errorCode).toBe('event.name.required')
-    })
-
-    it('Should retun an error about field too long', () => {
-      const eventBE = new EventBE('1'.repeat(101), null, null, null)
-      const errors = checkName(eventBE)
-      expect(errors).toHaveLength(1)
-      expect(errors[0].errorField).toBe('name')
-      expect(errors[0].errorCode).toBe('event.name.length')
+    it('Should return an error when length greater than 250', () => {
+      event.description = '1'.repeat(251)
+      checkInvalidity(event, 'description', 'string.max')
     })
   })
 
-  describe('checkDescription', () => {
-    it('Should be valid', () => {
-      const eventBE = new EventBE(null, 'description', null, null)
-      const errors = checkDescription(eventBE)
-      expect(errors).toHaveLength(0)
+  describe('startDate', () => {
+    it('Should return an error when not set', () => {
+      event.startDate = undefined
+      checkInvalidity(event, 'startDate', 'any.required')
     })
 
-    it('Should retun an error about field description required', () => {
-      const eventBE = new EventBE(null, undefined, null, null)
-      const errors = checkDescription(eventBE)
-      expect(errors).toHaveLength(1)
-      expect(errors[0].errorField).toBe('description')
-      expect(errors[0].errorCode).toBe('event.description.required')
+    it('Should return an error when empty', () => {
+      event.startDate = ''
+      checkInvalidity(event, 'startDate', 'date.base')
     })
 
-    it('Should retun an error about field description required', () => {
-      const eventBE = new EventBE(null, null, null, null)
-      const errors = checkDescription(eventBE)
-      expect(errors).toHaveLength(1)
-      expect(errors[0].errorField).toBe('description')
-      expect(errors[0].errorCode).toBe('event.description.required')
+    it('Should return an error when misformatted (123)', () => {
+      event.startDate = '123'
+      checkInvalidity(event, 'startDate', 'date.format')
     })
 
-    it('Should retun an error about field description required', () => {
-      const eventBE = new EventBE(null, '', null, null)
-      const errors = checkDescription(eventBE)
-      expect(errors).toHaveLength(1)
-      expect(errors[0].errorField).toBe('description')
-      expect(errors[0].errorCode).toBe('event.description.required')
+    it('Should return an error when misformatted (2018-02-25 18:00:00.000+01:00)', () => {
+      event.startDate = '2018-02-25 18:00:00.000+01:00'
+      checkInvalidity(event, 'startDate', 'date.format')
     })
 
-    it('Should retun an error about field description required', () => {
-      const eventBE = new EventBE(null, 0, null, null)
-      const errors = checkDescription(eventBE)
-      expect(errors).toHaveLength(1)
-      expect(errors[0].errorField).toBe('description')
-      expect(errors[0].errorCode).toBe('event.description.required')
+    it('Should return an error when misformatted (2018-02-25)', () => {
+      event.startDate = '2018-02-25'
+      checkInvalidity(event, 'startDate', 'date.format')
     })
 
-    it('Should retun an error about field description too long', () => {
-      const eventBE = new EventBE(null, '1'.repeat(251), null, null)
-      const errors = checkDescription(eventBE)
-      expect(errors).toHaveLength(1)
-      expect(errors[0].errorField).toBe('description')
-      expect(errors[0].errorCode).toBe('event.description.length')
+    it('Should return an error when misformatted (2018-02-29T18:00:00.000+01:00)', () => {
+      event.startDate = '2018-02-29T18:00:00.000+01:00'
+      checkInvalidity(event, 'startDate', 'date.format')
     })
   })
 
-  describe('checkStartDate', () => {
-    it('Should be valid', () => {
-      const eventBE = new EventBE(null, null, '2012-12-21T12:12:21.000Z', null)
-      const errors = checkStartDate(eventBE)
-      expect(errors).toHaveLength(0)
+  describe('endDate', () => {
+    it('Should return an error when not set', () => {
+      event.endDate = undefined
+      checkInvalidity(event, 'endDate', 'any.required')
     })
 
-    it('Should retun an error about field startDate required', () => {
-      const eventBE = new EventBE(null, null, undefined, null)
-      const errors = checkStartDate(eventBE)
-      expect(errors).toHaveLength(1)
-      expect(errors[0].errorField).toBe('startDate')
-      expect(errors[0].errorCode).toBe('event.startDate.required')
+    it('Should return an error when empty', () => {
+      event.endDate = ''
+      checkInvalidity(event, 'endDate', 'date.base')
     })
 
-    it('Should retun an error about field startDate required', () => {
-      const eventBE = new EventBE(null, null, null, null)
-      const errors = checkStartDate(eventBE)
-      expect(errors).toHaveLength(1)
-      expect(errors[0].errorField).toBe('startDate')
-      expect(errors[0].errorCode).toBe('event.startDate.required')
+    it('Should return an error when misformatted (123)', () => {
+      event.endDate = '123'
+      checkInvalidity(event, 'endDate', 'date.format')
     })
 
-    it('Should retun an error about field startDate misformatted', () => {
-      const eventBE = new EventBE(null, null, '2012-12-21T12:12:21.000', null)
-      const errors = checkStartDate(eventBE)
-      expect(errors).toHaveLength(1)
-      expect(errors[0].errorField).toBe('startDate')
-      expect(errors[0].errorCode).toBe('event.startDate.type')
+    it('Should return an error when misformatted (2018-02-25 18:00:00.000+01:00)', () => {
+      event.endDate = '2018-02-25 18:00:00.000+01:00'
+      checkInvalidity(event, 'endDate', 'date.format')
     })
-    it('Should retun an error about field startDate misformatted', () => {
-      const eventBE = new EventBE(null, null, '2012 Mathilde', null)
-      const errors = checkStartDate(eventBE)
-      expect(errors).toHaveLength(1)
-      expect(errors[0].errorField).toBe('startDate')
-      expect(errors[0].errorCode).toBe('event.startDate.type')
+
+    it('Should return an error when misformatted (2018-02-25)', () => {
+      event.endDate = '2018-02-25'
+      checkInvalidity(event, 'endDate', 'date.format')
+    })
+
+    it('Should return an error when misformatted (2018-02-29T18:00:00.000+01:00)', () => {
+      event.endDate = '2018-02-29T18:00:00.000+01:00'
+      checkInvalidity(event, 'endDate', 'date.format')
+    })
+
+    it('Should return an error when endDate before startDate', () => {
+      event.startDate = '2019-02-20T18:00:00.000+01:00'
+      event.endDate = '2017-02-20T18:00:00.000+01:00'
+      checkInvalidity(event, 'endDate', 'date.greater')
+    })
+
+    it('Should return an error when endDate equals to startDate', () => {
+      event.startDate = '2019-02-20T18:00:00.000+01:00'
+      event.endDate = '2019-02-20T18:00:00.000+01:00'
+      checkInvalidity(event, 'endDate', 'date.greater')
     })
   })
 
-  describe('checkEndDate', () => {
-    it('Should be valid', () => {
-      const eventBE = new EventBE(null, null, null, '2012-12-21T12:12:21.000Z')
-      const errors = checkEndDate(eventBE)
-      expect(errors).toHaveLength(0)
+  describe('administratorIds', () => {
+    it('Should return an error when not set', () => {
+      event.administratorIds = undefined
+      checkInvalidity(event, 'administratorIds', 'any.required')
     })
 
-    it('Should retun an error about field endDate required', () => {
-      const eventBE = new EventBE(null, null, null, undefined)
-      const errors = checkEndDate(eventBE)
-      expect(errors).toHaveLength(1)
-      expect(errors[0].errorField).toBe('endDate')
-      expect(errors[0].errorCode).toBe('event.endDate.required')
-    })
-
-    it('Should retun an error about field endDate required', () => {
-      const eventBE = new EventBE(null, null, null, null)
-      const errors = checkEndDate(eventBE)
-      expect(errors).toHaveLength(1)
-      expect(errors[0].errorField).toBe('endDate')
-      expect(errors[0].errorCode).toBe('event.endDate.required')
-    })
-
-    it('Should retun an error about field endDate misformatted', () => {
-      const eventBE = new EventBE(null, null, null, '2012-12-21T12:12:21.000')
-      const errors = checkEndDate(eventBE)
-      expect(errors).toHaveLength(1)
-      expect(errors[0].errorField).toBe('endDate')
-      expect(errors[0].errorCode).toBe('event.endDate.type')
-    })
-    it('Should retun an error about field endDate misformatted', () => {
-      const eventBE = new EventBE(null, null, null, '2012 Mathilde')
-      const errors = checkEndDate(eventBE)
-      expect(errors).toHaveLength(1)
-      expect(errors[0].errorField).toBe('endDate')
-      expect(errors[0].errorCode).toBe('event.endDate.type')
+    it('Should return an error when empty', () => {
+      event.administratorIds = []
+      checkInvalidity(event, 'administratorIds', 'array.min')
     })
   })
 
-  describe('checkDatesChronology', () => {
-    it('Start date should be before end date', () => {
-      const eventBE = new EventBE(
-        null,
-        null,
-        '2012-12-20T12:12:21.000Z',
-        '2012-12-21T12:12:21.000Z'
-      )
-      const errors = checkStartDateBeforeEndDate(eventBE)
-      expect(errors).toHaveLength(0)
+  describe('speakerIds', () => {
+    it('Should return an error when not set', () => {
+      event.speakerIds = undefined
+      checkInvalidity(event, 'speakerIds', 'any.required')
     })
 
-    it('Start date should be strictly before end date', () => {
-      const eventBE = new EventBE(
-        null,
-        null,
-        '2012-12-21T12:12:21.000Z',
-        '2012-12-21T12:12:21.000Z'
-      )
-      const errors = checkStartDateBeforeEndDate(eventBE)
-      expect(errors).toHaveLength(1)
-      expect(errors[0].errorCode).toBe('event.date')
+    it('Should return an error when empty', () => {
+      event.speakerIds = []
+      checkInvalidity(event, 'speakerIds', 'array.min')
+    })
+  })  
+
+  describe('maxSeatsNb', () => {
+    it('Should return an error when not set', () => {
+      event.maxSeatsNb = undefined
+      checkInvalidity(event, 'maxSeatsNb', 'any.required')
     })
 
-    it('Start date should be before end date', () => {
-      const eventBE = new EventBE(
-        null,
-        null,
-        '2012-12-23T12:12:21.000Z',
-        '2012-12-21T12:12:21.000Z'
-      )
-      const errors = checkStartDateBeforeEndDate(eventBE)
-      expect(errors).toHaveLength(1)
-      expect(errors[0].errorCode).toBe('event.date')
+    it('Should return an error when empty', () => {
+      event.maxSeatsNb = ''
+      checkInvalidity(event, 'maxSeatsNb', 'number.base')
+    })
+
+    it('Should return an error when alphanumeric', () => {
+      event.maxSeatsNb = 'A'
+      checkInvalidity(event, 'maxSeatsNb', 'number.base')
+    })
+
+    it('Should return an error when float', () => {
+      event.maxSeatsNb = 1.5
+      checkInvalidity(event, 'maxSeatsNb', 'number.integer')
+    })
+
+    it('Should return an error when negative', () => {
+      event.maxSeatsNb = -14
+      checkInvalidity(event, 'maxSeatsNb', 'number.positive')
+    })   
+
+    it('Should return an error when 0', () => {
+      event.maxSeatsNb = 0
+      checkInvalidity(event, 'maxSeatsNb', 'number.positive')
+    })       
+  })
+  
+  describe('participants', () => {
+    it('Should return an empty array when not set', () => {
+      const result = checkEvent(event)
+      expect(result.participants).toEqual([])
+    })
+
+    it('Should return the set array when it is set', () => {
+      event.participants = [{ userId: 'participant@systeme-u.fr', isConfirmed: true }]
+      const result = checkEvent(event)
+      expect(result.participants).toEqual([{ userId: 'participant@systeme-u.fr', isConfirmed: true }])
+    })
+    
+    it('Should return the set array completed with default value', () => {
+      event.participants = [{ userId: 'participant@systeme-u.fr' }]
+      const result = checkEvent(event)
+      expect(result.participants).toEqual([{ userId: 'participant@systeme-u.fr', isConfirmed: false }])
+    })
+    
+    it('Should return an error when userId is not a valid email', () => {
+      event.participants = [{ userId: 'participantsysteme-u.fr' }]
+      checkInvalidity(event, 'participants.0.userId', 'string.email')
+    })
+
+    it('Should return an error when not an array', () => {
+      event.participants = 'participant'
+      checkInvalidity(event, 'participants', 'array.base')
     })
   })
-
-  describe('checkAdministrator', () => {
-    it('Administrator should not be null', () => {
-      const eventBE = new EventBE(null, null, null, null, null, null, null)
-      const errors = checkAdministrator(eventBE)
-      expect(errors).toHaveLength(1)
-      expect(errors[0].errorCode).toBe('event.administrators')
+  
+  describe('roomId', () => {
+    it('Should return \'irisLab\' when not set', () => {
+      const result = checkEvent(event)
+      expect(result.roomId).toBe('irisLab')
     })
 
-    it('Administrators should not be undefined', () => {
-      const eventBE = new EventBE(null, null, null, null, null, undefined, null)
-      const errors = checkAdministrator(eventBE)
-      expect(errors).toHaveLength(1)
-      expect(errors[0].errorCode).toBe('event.administrators')
+    it('Should return the set array when it is set', () => {
+      event.roomId = 'roomId'
+      const result = checkEvent(event)
+      expect(result.roomId).toBe('roomId')
+    })
+    
+    it('Should return an error when not a string', () => {
+      event.roomId = []
+      checkInvalidity(event, 'roomId', 'string.base')
+    })
+  })
+  
+  describe('isDrawDone', () => {
+    it('Should return false when not set', () => {
+      const result = checkEvent(event)
+      expect(result.isDrawDone).toBe(false)
     })
 
-    it('Administrators should not be empty', () => {
-      const eventBE = new EventBE(null, null, null, null, null, [], null)
-      const errors = checkAdministrator(eventBE)
-      expect(errors).toHaveLength(1)
-      expect(errors[0].errorCode).toBe('event.administrators')
-    })
+    it('Should return true when it is set to true', () => {
+      event.isDrawDone = true
+      const result = checkEvent(event)
+      expect(result.isDrawDone).toBe(true)
+    }) 
 
-    it('Administrators is defined', () => {
-      const eventBE = new EventBE(null, null, null, null, null, [1], null)
-      const errors = checkAdministrator(eventBE)
-      expect(errors).toHaveLength(0)
+    it('Should return an error when not a boolean', () => {
+      event.isDrawDone = 'vrai'
+      checkInvalidity(event, 'isDrawDone', 'boolean.base')
     })
   })
 })

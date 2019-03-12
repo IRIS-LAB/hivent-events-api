@@ -1,102 +1,53 @@
-import { MongoClient, ObjectId } from 'mongodb'
-import { eventsDB } from './init/EventsDB'
-import { TechnicalException } from 'iris-common'
+import { db } from './db'
 
-const url = 'mongodb://localhost:27021/'
-
-const connect = async () => {
-  let connection = await MongoClient.connect(
-    url,
-    { useNewUrlParser: true }
-  )
-  let db = connection.db('Events')
-  return db
-}
-
-export const findEvents = async query => {
-  let eventsDB = await connect()
-  let findRequest = {}
-  if (query.groupId !== undefined) {
-    findRequest.groupId = parseInt(groupId)
+export const findEvents = async (filters) => {
+  // Set up path
+  let eventsRef = db.collection('events')
+  if (filters) {
+    eventsRef = !filters.title ? eventsRef : eventsRef.where("title", "==", filters.title)
+    eventsRef = !filters.afterStartDate ? eventsRef : eventsRef.where("startDate", ">=", new Date(filters.afterStartDate))
+    eventsRef = !filters.beforeStartDate ? eventsRef : eventsRef.where("startDate", "<=", new Date(filters.beforeStartDate))
   }
-  if (query.groupId !== undefined) {
-    findRequest.groupId = parseInt(groupId)
-  }
-  if (query.beginDate !== undefined) {
-    findRequest.startDate = {}
-    findRequest.startDate.$gte = new Date(beginDate)
-  }
-  if (query.endDate !== undefined) {
-    if (!findRequest.startDate) {
-      findRequest.startDate = {}
-    }
-    findRequest.startDate.$lte = new Date(endDate)
-  }
-  if (query.interestedId !== undefined) {
-    if (!findRequest.interested) {
-      findRequest.interested = {}
-    }
-    findRequest.interested.id = parseInt(interestedId)
-  }
-  if (query.administratorId !== undefined) {
-    if (!findRequest.administrators) {
-      findRequest.administrators = {}
-    }
-    findRequest.administrators.id = parseInt(administratorId)
-  }
-  if (query.participantId !== undefined) {
-    if (!findRequest.participants) {
-      findRequest.participants = {}
-    }
-    findRequest.participants.id = parseInt(participantId)
-  }
-  let events = await eventsDB
-    .collection('Events')
-    .find(findRequest)
-    .toArray()
-  // eventsDB.connection.close()
-  return events
+  // Find documents
+  let querySnapshot = await eventsRef.get()
+  // Construct result
+  let eventsList = []
+  querySnapshot.forEach(doc => {
+    let event = doc.data()
+    event.startDate = event.startDate.toDate()
+    event.endDate = event.endDate.toDate()
+    eventsList.push(event)
+  })
+  // Return data
+  return eventsList
 }
 
 export const getEvent = async eventId => {
-  let eventsDB = await connect()
-  let oid = new ObjectId(eventId)
-  let event = await eventsDB.collection('Events').findOne({ _id: oid })
-  //eventsDB.connection.close()
-  return event
-}
-
-export const updateEvent = async event => {
-  let eventsDB = await connect()
-  let response
-  try {
-    response = await eventsDB
-      .collection('Events')
-      .updateOne({ id: event.id }, { $set: event })
-    /*console.log(JSON.stringify(response))*/
-  } catch (error) {
-    throw new TechnicalException(error)
-  }
-  console.log(response)
-  console.log(response.ok)
-  if (1 === response.ok) {
-    return event.id
-  } else {
-    console.log(response.ok)
-    throw new TechnicalException('Response not ok, code : ' + response.ok)
-  }
+  // Read document
+  const event = await db.collection('events').doc(eventId).get()
+  // Return data
+  let result = event.data()
+  result.startDate = result.startDate.toDate()
+  result.endDate = result.endDate.toDate()
+  return result
 }
 
 export const createEvent = async event => {
-  let eventsDB = await connect()
-  let newEvent = await eventsDB.collection('Events').insertOne(event)
-  //eventsDB.connection.close()
-  return newEvent.ops[0]
+  // Set up path
+  let doc = db.collection('events').doc()
+  event.id = doc.id
+  // Create document
+  await doc.set(event)
+  // Return data
+  return event.id
 }
 
-export const init = async () => {
-  let db = await connect()
-  //await db.collection('Events').drop()
-  let newEvents = await db.collection('Events').insertMany(eventsDB)
-  return newEvents.ops
+export const updateEvent = async event => {
+  let doc = db.collection('events').doc(event.id)
+  await doc.set(event)
+}
+
+export const deleteEvent = async id => {
+  let doc = db.collection('events').doc(id)
+  await doc.delete()
 }

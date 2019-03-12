@@ -1,70 +1,50 @@
 import express from 'express'
 import * as eventsLBS from '../business/EventsLBS'
-import { EventBE } from '../objects/business/be/EventBE'
-import * as mappers from './mappers/Mappers'
-import { BusinessException } from 'iris-common'
 
 export const getRouter = () => {
   let eventsRouter = express.Router()
 
   // find
-  eventsRouter.get('/', async (req, res) => {
+  eventsRouter.get('/', async (req, res, next) => {
     try {
       res.send(await eventsLBS.findEvents(req.query))
     } catch (error) {
-      console.log('An error occured', error)
-      res.status(500).send('An error occured')
+      return next(error)
     }
   })
 
   // read
-  eventsRouter.get('/:eventId', async (req, res) => {
+  eventsRouter.get('/:eventId', async (req, res, next) => {
     try {
       res.send(await eventsLBS.getEvent(req.params.eventId))
     } catch (error) {
-      console.log('An error occured', error)
-      res.status(500).send('An error occured')
+      return next(error)
     }
   })
 
   // create
-  eventsRouter.post('/', async (req, res) => {
+  eventsRouter.post('/', async (req, res, next) => {
     try {
-      let eventBe = mappers.jsonToEventBE(req.body)
-      console.log(typeof eventBe)
-      res.send(await eventsLBS.createEvent(eventBe))
+      res.status(201).send(await eventsLBS.createEvent(req.body))
     } catch (error) {
-      console.log('An error occured', error)
-      if (error instanceof BusinessException) {
-        res.status(400).send(error)
-      } else {
-        res.status(500).send('An error occured')
-      }
+      return next(error)
     }
   })
 
   // update
-  eventsRouter.put('/', async (req, res) => {
+  eventsRouter.put('/:id', async (req, res, next) => {
     try {
-      let eventBe = mappers.jsonToEventBE(req.body)
-      console.log(typeof eventBe)
-      res.send(await eventsLBS.updateEvent(eventBe))
+      res.send(await eventsLBS.updateEvent(req.body, req.params.id))
     } catch (error) {
-      console.log('An error occured', error)
-      if (error instanceof BusinessException) {
-        res.status(400).send(error)
-      } else {
-        res.status(500).send('An error occured')
-      }
+      return next(error)
     }
   })
-
-  // initialisation de la base
-  eventsRouter.post('/init', async (req, res) => {
+  
+  eventsRouter.delete('/:id', async(req,res, next) => {
     try {
-      res.send(await eventsLBS.init())
+      res.status(204).send(await eventsLBS.deleteEvent(req.params.id))
     } catch (error) {
-      console.log(error)
+      return next(error)
     }
   })
 
