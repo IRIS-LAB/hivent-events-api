@@ -20,6 +20,10 @@
     "url": "https://github.com/IRIS-LAB/hivent-events-api/issues"
   },
   "homepage": "https://github.com/IRIS-LAB/hivent-events-api#readme",
+  "engines": {
+    "node": ">=8",
+    "npm": "5.x"
+  },
   "dependencies": {
     "@babel/runtime": "^7.1.2",
     "@google-cloud/firestore": "^1.0.1",

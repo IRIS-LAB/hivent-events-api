@@ -16,3 +16,4 @@ firestore/
 *.ntvs*
 *.njsproj
 *.sln
+*.log
