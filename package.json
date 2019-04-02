@@ -27,7 +27,7 @@
   "dependencies": {
     "@babel/runtime": "^7.1.2",
     "@google-cloud/firestore": "^1.0.1",
-    "@u-iris/iris-back": "^1.0.11",
+    "@u-iris/iris-back": "^1.0.13-1",
     "@u-iris/iris-common": "^1.0.7",
     "body-parser": "^1.18.3",
     "dotenv": "^6.2.0",
