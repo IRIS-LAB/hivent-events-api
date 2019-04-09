@@ -5,10 +5,12 @@ import eventSchema from '../schemas/event'
 
 export const checkEvent = event => {
   const { error, value } = Joi.validate(event, eventSchema, { abortEarly: false })
+
+  let errors = undefined
   if (error) {
-    const errors = error.details.map(({ message, path, type }) => {
+    errors = error.details.map(({ message, path, type }) => {
       const field = path.join('.')
-      return new ErreurDO(field, type, message.replace(/\"/g, ""))
+      return new ErreurDO(field, type, message.replace(/\"/g, ''))
     })
     throw new BusinessException(errors)
   }
