@@ -19,7 +19,7 @@ export const createEvent = async event => {
   }
 }
 
-export const updateEvent = async (event,id) => {
+export const updateEvent = async (event, id) => {
   try {
     event.id = id
     await validatorLBS.checkEvent(event)
