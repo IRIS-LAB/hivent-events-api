@@ -8,6 +8,8 @@ export const findEvents = async (filters) => {
     eventsRef = !filters.afterStartDate ? eventsRef : eventsRef.where("startDate", ">=", new Date(filters.afterStartDate))
     eventsRef = !filters.beforeStartDate ? eventsRef : eventsRef.where("startDate", "<=", new Date(filters.beforeStartDate))
   }
+  //eventsRef.orderBy('startDate', 'asc')
+  eventsRef.orderBy('title', 'asc')
   // Find documents
   let querySnapshot = await eventsRef.get()
   // Construct result
@@ -15,6 +17,9 @@ export const findEvents = async (filters) => {
   querySnapshot.forEach(doc => {
     let event = doc.data()
     event.startDate = event.startDate.toDate()
+    //console.log(event.startDate)
+    console.log(event.title)
+
     event.endDate = event.endDate.toDate()
     eventsList.push(event)
   })
