@@ -37,3 +37,5 @@ export const deleteEvent = async id => {
     throw error
   }
 }
+
+export const countEvents = async () => await eventsDAO.countEvents()

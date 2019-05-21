@@ -1,5 +1,10 @@
 import express from 'express'
 import * as eventsLBS from '../business/EventsLBS'
+import { paginationUtilsEBS } from '@u-iris/iris-back'
+
+const PAGINATION_EVENTS_DEFAULT_SIZE = 20
+const PAGINATION_EVENTS_MAX_SIZE = 100
+const PAGINATION_EVENTS_TYPE = 'event'
 
 export const getRouter = () => {
   let eventsRouter = express.Router()
@@ -7,7 +12,11 @@ export const getRouter = () => {
   // find
   eventsRouter.get('/', async (req, res, next) => {
     try {
-      res.send(await eventsLBS.findEvents(req.query))
+      paginationUtilsEBS.checkPagination(req.query, PAGINATION_EVENTS_MAX_SIZE, PAGINATION_EVENTS_DEFAULT_SIZE) 
+      const events  = await eventsLBS.findEvents(req.query)
+      const eventsCount = await eventsLBS.countEvents()
+      paginationUtilsEBS.generateResponse(PAGINATION_EVENTS_TYPE, PAGINATION_EVENTS_MAX_SIZE, eventsCount, events.length, req, res)
+      res.send(events)
     } catch (error) {
       return next(error)
     }
