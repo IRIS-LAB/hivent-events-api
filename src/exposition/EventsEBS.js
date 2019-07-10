@@ -12,8 +12,8 @@ export const getRouter = () => {
   // find
   eventsRouter.get('/', async (req, res, next) => {
     try {
-      paginationUtilsEBS.checkPagination(req.query, PAGINATION_EVENTS_MAX_SIZE, PAGINATION_EVENTS_DEFAULT_SIZE) 
-      const events  = await eventsLBS.findEvents(req.query)
+      paginationUtilsEBS.checkPagination(req.query, PAGINATION_EVENTS_MAX_SIZE, PAGINATION_EVENTS_DEFAULT_SIZE)
+      const events = await eventsLBS.findEvents(req.query)
       const eventsCount = await eventsLBS.countEvents()
       paginationUtilsEBS.generateResponse(PAGINATION_EVENTS_TYPE, PAGINATION_EVENTS_MAX_SIZE, eventsCount, events.length, req, res)
       res.send(events)
@@ -40,6 +40,15 @@ export const getRouter = () => {
     }
   })
 
+  // create image
+  eventsRouter.put('/:eventId/image', async (req, res, next) => {
+    try {
+      res.status(200).send(await eventsLBS.uploadImage(req.body))
+    } catch (error) {
+      return next(error)
+    }
+  })
+
   // update
   eventsRouter.put('/:id', async (req, res, next) => {
     try {
@@ -48,8 +57,8 @@ export const getRouter = () => {
       return next(error)
     }
   })
-  
-  eventsRouter.delete('/:id', async(req,res, next) => {
+
+  eventsRouter.delete('/:id', async (req, res, next) => {
     try {
       res.status(204).send(await eventsLBS.deleteEvent(req.params.id))
     } catch (error) {

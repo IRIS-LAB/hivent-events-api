@@ -8,9 +8,11 @@ export const checkEvent = event => {
 
   let errors = undefined
   if (error) {
-    errors = error.details.map(({ message, path, type }) => {
+    console.log('error joy ', error)
+    errors = error.details.map(({ message, path, type, context }) => {
       const field = path.join('.')
-      return new ErreurDO(field, type, message.replace(/\"/g, ''))
+      if (context.limit) return new ErreurDO(field, type + '(' + context.limit + ')', message.replace(/\"/g, ''))
+      else return new ErreurDO(field, type, message.replace(/\"/g, ''))
     })
     throw new BusinessException(errors)
   }

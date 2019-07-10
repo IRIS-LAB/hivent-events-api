@@ -1,20 +1,26 @@
 import { db } from './db'
+import { storage } from './bucket'
+import stream from 'stream'
 
-export const findEvents = async (filters) => {
+const BUCKET_HIVENT_EVENTS_IMAGES = 'hivent-events-images'
+
+export const findEvents = async filters => {
   // order by
-  console.log('size '+filters.size)
-  console.log('page '+filters.page)
+  console.log('size ' + filters.size)
+  console.log('page ' + filters.page)
 
-  let eventsRef = db.collection('events').orderBy('startDate').limit(filters.size).offset(filters.size*filters.page)
-
+  let eventsRef = db
+    .collection('events')
+    .orderBy('startDate')
+    .limit(filters.size)
+    .offset(filters.size * filters.page)
 
   // where
   if (filters) {
-    eventsRef = !filters.title ? eventsRef : eventsRef.where("title", "==", filters.title)
-    eventsRef = !filters.afterStartDate ? eventsRef : eventsRef.where("startDate", ">=", new Date(filters.afterStartDate))
-    eventsRef = !filters.beforeStartDate ? eventsRef : eventsRef.where("startDate", "<=", new Date(filters.beforeStartDate))
+    eventsRef = !filters.title ? eventsRef : eventsRef.where('title', '==', filters.title)
+    eventsRef = !filters.afterStartDate ? eventsRef : eventsRef.where('startDate', '>=', new Date(filters.afterStartDate))
+    eventsRef = !filters.beforeStartDate ? eventsRef : eventsRef.where('startDate', '<=', new Date(filters.beforeStartDate))
   }
-
 
   // Find documents
   let querySnapshot = await eventsRef.get()
@@ -35,7 +41,10 @@ export const findEvents = async (filters) => {
 
 export const getEvent = async eventId => {
   // Read document
-  const event = await db.collection('events').doc(eventId).get()
+  const event = await db
+    .collection('events')
+    .doc(eventId)
+    .get()
   // Return data
   let result = event.data()
   result.startDate = result.startDate.toDate()
@@ -61,6 +70,23 @@ export const updateEvent = async event => {
 export const deleteEvent = async id => {
   let doc = db.collection('events').doc(id)
   await doc.delete()
+}
+
+export const uploadImage = async imageEvent => {
+  const bufferStream = new stream.PassThrough()
+  bufferStream.end(Buffer.from(imageEvent.image, 'base64'))
+
+  const bucket = storage.bucket(BUCKET_HIVENT_EVENTS_IMAGES)
+  const file = bucket.file(imageEvent.eventId + '.png')
+
+  bufferStream
+    .pipe(file.createWriteStream({ metadata: { contentType: 'image/png' } }))
+    .on('error', function(err) {
+      console.log(err)
+    })
+    .on('finish', function() {
+      console.log('OK')
+    })
 }
 
 export const countEvents = async () => (await db.collection('events').get()).size
