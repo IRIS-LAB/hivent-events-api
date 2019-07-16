@@ -4,19 +4,17 @@ import participant from './participant'
 
 const Joi = JoiBase.extend(JoiDateExtension)
 
-const MAX_TITLE_LENGTH = 10
-const MAX_DESCRIPTION_LENGTH = 100
+const MAX_TITLE_LENGTH = 50
+const MAX_DESCRIPTION_LENGTH = 200
 
 export default Joi.object().keys({
   id: Joi.optional(),
   title: Joi.string()
     .max(MAX_TITLE_LENGTH)
     .required(),
-  description: Joi.string()
-    // .email()
-    .max(MAX_DESCRIPTION_LENGTH)
-    //.min(10)
-    .required(),
+  description: Joi.string().max(MAX_DESCRIPTION_LENGTH),
+  //.min(10)
+  //.required(),
   startDate: Joi.date()
     .format('YYYY-MM-DDTHH:mm:ss.SSSZ')
     .required(),

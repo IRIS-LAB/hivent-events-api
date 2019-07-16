@@ -26,8 +26,16 @@ export const deleteEvent = async id => {
   await eventsDAO.deleteEvent(id)
 }
 
-export const uploadImage = async imageEvent => {
-  await eventsDAO.uploadImage(imageEvent)
+export const deleteAllEvents = async () => {
+  let events = await eventsDAO.findEvents({ size: 999999, page: 0 })
+  events.forEach(e => eventsDAO.deleteEvent(e.id))
+}
+
+export const uploadImage = async (eventId, imageEvent) => {
+  await eventsDAO.uploadImage(eventId, imageEvent)
+  const event = await getEvent(eventId)
+  event.imageURL = `${process.env.GS_EVENTS_IMAGES}${eventId}.${imageEvent.format}`
+  return updateEvent(event, eventId)
 }
 
 export const countEvents = async () => await eventsDAO.countEvents()

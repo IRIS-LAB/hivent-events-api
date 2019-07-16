@@ -3,7 +3,7 @@ import * as eventsLBS from '../business/EventsLBS'
 import { paginationUtilsEBS } from '@u-iris/iris-back'
 
 const PAGINATION_EVENTS_DEFAULT_SIZE = 20
-const PAGINATION_EVENTS_MAX_SIZE = 100
+const PAGINATION_EVENTS_MAX_SIZE = 999999999999999999
 const PAGINATION_EVENTS_TYPE = 'event'
 
 export const getRouter = () => {
@@ -43,7 +43,7 @@ export const getRouter = () => {
   // create image
   eventsRouter.put('/:eventId/image', async (req, res, next) => {
     try {
-      res.status(200).send(await eventsLBS.uploadImage(req.body))
+      res.status(200).send(await eventsLBS.uploadImage(req.params.eventId, req.body))
     } catch (error) {
       return next(error)
     }
@@ -61,6 +61,14 @@ export const getRouter = () => {
   eventsRouter.delete('/:id', async (req, res, next) => {
     try {
       res.status(204).send(await eventsLBS.deleteEvent(req.params.id))
+    } catch (error) {
+      return next(error)
+    }
+  })
+
+  eventsRouter.delete('/', async (req, res, next) => {
+    try {
+      res.status(204).send(await eventsLBS.deleteAllEvents())
     } catch (error) {
       return next(error)
     }

@@ -9,6 +9,8 @@ yarn-error.log*
 selenium-debug.log
 firestore/
 bucket/
+*.jpg
+*.png
 
 # Editor directories and files
 .idea

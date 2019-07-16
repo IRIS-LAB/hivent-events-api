@@ -1,13 +1,12 @@
 import { db } from './db'
 import { storage } from './bucket'
 import stream from 'stream'
+import fs from 'fs'
 
 const BUCKET_HIVENT_EVENTS_IMAGES = 'hivent-events-images'
 
 export const findEvents = async filters => {
   // order by
-  console.log('size ' + filters.size)
-  console.log('page ' + filters.page)
 
   let eventsRef = db
     .collection('events')
@@ -29,8 +28,6 @@ export const findEvents = async filters => {
   querySnapshot.forEach(doc => {
     let event = doc.data()
     event.startDate = event.startDate.toDate()
-    //console.log(event.startDate)
-    console.log(event.startDate)
 
     event.endDate = event.endDate.toDate()
     eventsList.push(event)
@@ -72,21 +69,25 @@ export const deleteEvent = async id => {
   await doc.delete()
 }
 
-export const uploadImage = async imageEvent => {
-  const bufferStream = new stream.PassThrough()
-  bufferStream.end(Buffer.from(imageEvent.image, 'base64'))
+const deleteFile = filename => {
+  if (fs.existsSync(filename)) {
+    fs.unlinkSync(filename)
+  }
+}
 
-  const bucket = storage.bucket(BUCKET_HIVENT_EVENTS_IMAGES)
-  const file = bucket.file(imageEvent.eventId + '.png')
+const saveLocalImage = (eventId, format, imageFormatBase64) => {
+  const filename = `${eventId}.${format}`
+  deleteFile(filename)
+  fs.writeFileSync(filename, new Buffer(imageFormatBase64, 'base64'))
+  return filename
+}
 
-  bufferStream
-    .pipe(file.createWriteStream({ metadata: { contentType: 'image/png' } }))
-    .on('error', function(err) {
-      console.log(err)
-    })
-    .on('finish', function() {
-      console.log('OK')
-    })
+export const uploadImage = async (eventId, imageEvent) => {
+  const filename = saveLocalImage(eventId, imageEvent.format, imageEvent.image)
+  const bucketEvent = storage.bucket(BUCKET_HIVENT_EVENTS_IMAGES)
+  const result = await bucketEvent.upload(filename)
+  deleteFile(filename)
+  await bucketEvent.file(filename).makePublic()
 }
 
 export const countEvents = async () => (await db.collection('events').get()).size
