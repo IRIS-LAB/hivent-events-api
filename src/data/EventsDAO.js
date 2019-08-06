@@ -44,8 +44,10 @@ export const getEvent = async eventId => {
     .get()
   // Return data
   let result = event.data()
-  result.startDate = result.startDate.toDate()
-  result.endDate = result.endDate.toDate()
+  if (result) {
+    result.startDate = result.startDate.toDate()
+    result.endDate = result.endDate.toDate()
+  }
   return result
 }
 

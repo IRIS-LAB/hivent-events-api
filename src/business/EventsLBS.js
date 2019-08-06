@@ -1,12 +1,17 @@
 import * as eventsDAO from '../data/EventsDAO'
 import * as validatorLBS from './ValidatorLBS'
+import { EntityNotFoundBusinessException, ErreurDO } from '@u-iris/iris-common'
 
 export const findEvents = async query => {
   return await eventsDAO.findEvents(query)
 }
 
 export const getEvent = async eventId => {
-  return await eventsDAO.getEvent(eventId)
+  const result = await eventsDAO.getEvent(eventId)
+  if (!result) {
+    throw new EntityNotFoundBusinessException(new ErreurDO('id', 'entity.not.found', 'Entity not found'))
+  }
+  return result
 }
 
 export const createEvent = async event => {
@@ -23,6 +28,7 @@ export const updateEvent = async (event, id) => {
 }
 
 export const deleteEvent = async id => {
+  await getEvent(id)
   await eventsDAO.deleteEvent(id)
 }
 
