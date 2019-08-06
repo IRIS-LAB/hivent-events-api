@@ -8,6 +8,9 @@ yarn-error.log*
 /test/e2e/reports/
 selenium-debug.log
 firestore/
+bucket/
+*.jpg
+*.png
 
 # Editor directories and files
 .idea

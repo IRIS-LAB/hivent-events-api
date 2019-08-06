@@ -10,32 +10,32 @@ export const getEvent = async eventId => {
 }
 
 export const createEvent = async event => {
-  try {
-    event = validatorLBS.checkEvent(event)
-    const id = await eventsDAO.createEvent(event)
-    return await getEvent(id)
-  } catch (error) {
-    throw error
-  }
+  event = validatorLBS.checkEvent(event)
+  const id = await eventsDAO.createEvent(event)
+  return await getEvent(id)
 }
 
 export const updateEvent = async (event, id) => {
-  try {
-    event.id = id
-    await validatorLBS.checkEvent(event)
-    await eventsDAO.updateEvent(event)
-    return await getEvent(event.id)
-  } catch (error) {
-    throw error
-  }
+  event.id = id
+  await validatorLBS.checkEvent(event)
+  await eventsDAO.updateEvent(event)
+  return await getEvent(event.id)
 }
 
 export const deleteEvent = async id => {
-  try {
-    await eventsDAO.deleteEvent(id)
-  } catch (error) {
-    throw error
-  }
+  await eventsDAO.deleteEvent(id)
+}
+
+export const deleteAllEvents = async () => {
+  let events = await eventsDAO.findEvents({ size: 999999, page: 0 })
+  events.forEach(e => eventsDAO.deleteEvent(e.id))
+}
+
+export const uploadImage = async (eventId, imageEvent) => {
+  await eventsDAO.uploadImage(eventId, imageEvent)
+  const event = await getEvent(eventId)
+  event.imageURL = `${process.env.GS_EVENTS_IMAGES}${eventId}.${imageEvent.format}`
+  return updateEvent(event, eventId)
 }
 
 export const countEvents = async () => await eventsDAO.countEvents()
